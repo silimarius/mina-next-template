@@ -5945,7 +5945,6 @@ __metadata:
   resolution: "mina-next-template@workspace:."
   dependencies:
     prettier: ^2.3.2
-    typescript: 5.1.6
   languageName: unknown
   linkType: soft
 
