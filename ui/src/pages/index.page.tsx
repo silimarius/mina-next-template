@@ -31,7 +31,6 @@ export default function Home() {
 
   useEffect(() => {
     void (async () => {
-      // TODO: maybe set to state
       let lastProgress: ProgressStage = "walletInit";
       try {
         if (!window) throw new Error("Not on client.");
