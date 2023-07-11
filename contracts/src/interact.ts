@@ -12,9 +12,9 @@
  * Build the project: `$ npm run build`
  * Run with node:     `$ node build/src/interact.js <deployAlias>`.
  */
-import { Mina, PrivateKey } from 'snarkyjs';
-import fs from 'fs/promises';
-import { Add } from './Add.js';
+import { Mina, PrivateKey } from "snarkyjs";
+import fs from "fs/promises";
+import { Add } from "./Add.js";
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -39,14 +39,14 @@ type Config = {
     }
   >;
 };
-let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
+let configJson: Config = JSON.parse(await fs.readFile("config.json", "utf8"));
 let config = configJson.deployAliases[deployAlias];
 let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.feepayerKeyPath, 'utf8')
+  await fs.readFile(config.feepayerKeyPath, "utf8")
 );
 
 let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
-  await fs.readFile(config.keyPath, 'utf8')
+  await fs.readFile(config.keyPath, "utf8")
 );
 
 let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
@@ -62,16 +62,16 @@ let zkApp = new Add(zkAppAddress);
 
 let sentTx;
 // compile the contract to create prover keys
-console.log('compile the contract...');
+console.log("compile the contract...");
 await Add.compile();
 try {
   // call update() and send transaction
-  console.log('build transaction and create proof...');
+  console.log("build transaction and create proof...");
   let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
     zkApp.update();
   });
   await tx.prove();
-  console.log('send transaction...');
+  console.log("send transaction...");
   sentTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
   console.log(err);

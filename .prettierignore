@@ -1,0 +1,10 @@
+# NodeJS
+node_modules
+build
+coverage
+
+# System
+.DS_Store
+
+# Misc
+LICENSE

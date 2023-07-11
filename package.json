@@ -1,0 +1,29 @@
+{
+  "name": "mina-next-template",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Template for full-stack Mina app using yarn",
+  "packageManager": "yarn@3.6.1",
+  "engines": {
+    "node": "^18.16.0"
+  },
+  "workspaces": [
+    "ui/",
+    "contracts/"
+  ],
+  "repository": {
+    "type": "git"
+  },
+  "scripts": {
+    "build": "yarn workspaces foreach --parallel run build",
+    "test": "yarn workspaces foreach --parallel run test",
+    "coverage": "yarn workspaces foreach --parallel run coverage",
+    "format": "prettier --write --loglevel warn '**/*.*'",
+    "lint": "yarn workspaces foreach --parallel run lint"
+  },
+  "author": "Marius Sili",
+  "devDependencies": {
+    "prettier": "^2.3.2",
+    "typescript": "5.1.6"
+  }
+}

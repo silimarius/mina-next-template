@@ -1,6 +1,5 @@
-// @ts-nocheck
-import styles from '@/styles/Home.module.css';
-import { useEffect, useState, useRef } from 'react';
+import styles from "@/styles/Home.module.css";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 export default function GradientBG({ children }) {
   const canvasRef = useRef(null);
@@ -17,7 +16,7 @@ export default function GradientBG({ children }) {
 
     this.toString = function () {
       return (
-        'hsla(' + this.h + ', ' + this.s + '%, ' + this.l + '%, ' + this.a + ')'
+        "hsla(" + this.h + ", " + this.s + "%, " + this.l + "%, " + this.a + ")"
       );
     };
   }
@@ -86,14 +85,17 @@ export default function GradientBG({ children }) {
     pixel.h.c += 0.005 * pixel.h.dir;
   }
 
-  function renderPixel(pixel) {
-    context.restore();
+  const renderPixel = useCallback(
+    (pixel) => {
+      context.restore();
 
-    context.fillStyle = pixel.color.toString();
-    context.fillRect(pixel.x.c, pixel.y.c, pixel.w.c, pixel.h.c);
-  }
+      context.fillStyle = pixel.color.toString();
+      context.fillRect(pixel.x.c, pixel.y.c, pixel.w.c, pixel.h.c);
+    },
+    [context]
+  );
 
-  function paint() {
+  const paint = useCallback(() => {
     if (canvasRef.current) {
       context.clearRect(
         0,
@@ -107,12 +109,12 @@ export default function GradientBG({ children }) {
         renderPixel(pixels[i]);
       }
     }
-  }
+  }, [context, pixels, renderPixel]);
 
   useEffect(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       setContext(ctx);
 
       const currentPixels = [
