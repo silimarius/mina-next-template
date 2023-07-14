@@ -87,7 +87,6 @@ export default class ZkappWorkerClient {
     const result = await this.call("getNum", {});
     if (!result) return;
     const strRes = z.string().parse(result);
-    // return Field.fromJSON(JSON.parse(strRes));
     return Field(strRes);
   }
 
