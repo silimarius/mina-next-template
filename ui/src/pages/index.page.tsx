@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 import { useContractStore } from "@/store/contract";
 import { wait, TRANSACTION_FEE } from "@/utils";
+import { useInitAccount } from "@/hooks/contract";
 
 import { zkappWorkerClient } from "./zkappWorkerClient";
 
@@ -19,11 +20,12 @@ export default function Home() {
 
   const setupState = useContractStore((state) => state.setupState);
   const setHasWallet = useContractStore((state) => state.setHasWallet);
-  const setAccountExists = useContractStore((state) => state.setAccountExists);
   const setCreatingTransaction = useContractStore(
     (state) => state.setCreatingTransaction
   );
   const setNum = useContractStore((state) => state.setNum);
+
+  useInitAccount();
 
   useEffect(() => {
     void (async () => {
@@ -83,26 +85,6 @@ export default function Home() {
       });
     })();
   }, [hasBeenSetup, setHasWallet, setupState]);
-
-  useEffect(() => {
-    void (async () => {
-      if (!zkappWorkerClient || !hasBeenSetup || accountExists || !publicKey)
-        return;
-
-      for (;;) {
-        console.log("checking if account exists...");
-        const res = await zkappWorkerClient.fetchAccount({
-          publicKey,
-        });
-        const accountExists = res.error == null;
-        if (accountExists) {
-          break;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      }
-      setAccountExists(true);
-    })();
-  }, [accountExists, hasBeenSetup, publicKey, setAccountExists]);
 
   const onSendTransaction = async () => {
     setCreatingTransaction(true);

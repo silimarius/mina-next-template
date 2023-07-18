@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { zkappWorkerClient } from "@/pages/zkappWorkerClient";
 import { useContractStore } from "@/store/contract";
+import { wait } from "@/utils";
 
 export const useInitAccount = () => {
   const hasBeenSetup = useContractStore((state) => state.hasBeenSetup);
@@ -15,17 +16,21 @@ export const useInitAccount = () => {
       if (!zkappWorkerClient || !hasBeenSetup || accountExists || !publicKey)
         return;
 
-      for (;;) {
-        console.log("checking if account exists...");
+      let attemptFetch = true;
+      while (attemptFetch) {
+        console.info("checking if account exists...");
+
         const res = await zkappWorkerClient.fetchAccount({
           publicKey,
         });
-        const accountExists = res.error == null;
-        if (accountExists) {
-          break;
+
+        if (!res.error) {
+          attemptFetch = false;
+        } else {
+          await wait(5000);
         }
-        await new Promise((resolve) => setTimeout(resolve, 5000));
       }
+
       setAccountExists(true);
     };
 
