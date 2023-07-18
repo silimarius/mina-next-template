@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { PublicKey } from "snarkyjs";
 
 import { useContractStore } from "@/store/contract";
-import { wait } from "@/utils";
+import { TRANSACTION_FEE, wait } from "@/utils";
 
 import { zkappWorkerClient } from "./zkappWorkerClient";
 
@@ -106,4 +106,47 @@ export const useInitAccount = () => {
 
     void initAccount();
   }, [accountExists, hasBeenSetup, publicKey, setAccountExists]);
+};
+
+export const useCallUpdate = () => {
+  const publicKey = useContractStore((state) => state.publicKey);
+
+  const setCreatingTransaction = useContractStore(
+    (state) => state.setCreatingTransaction
+  );
+
+  const callUpdate = async () => {
+    setCreatingTransaction(true);
+    console.info("sending a transaction...");
+
+    if (!zkappWorkerClient || !publicKey || !window.mina) return;
+
+    await zkappWorkerClient.fetchAccount({ publicKey });
+
+    await zkappWorkerClient.createUpdateTransaction();
+
+    console.info("creating proof...");
+    await zkappWorkerClient.proveUpdateTransaction();
+
+    console.info("getting Transaction JSON...");
+    const transactionJSON = await zkappWorkerClient.getTransactionJSON();
+    if (!transactionJSON) return;
+
+    console.info("requesting send transaction...");
+    const { hash } = await window.mina.sendTransaction({
+      transaction: transactionJSON,
+      feePayer: {
+        fee: TRANSACTION_FEE,
+        memo: "",
+      },
+    });
+
+    console.info(
+      `See transaction at https://berkeley.minaexplorer.com/transaction/${hash}`
+    );
+
+    setCreatingTransaction(false);
+  };
+
+  return callUpdate;
 };

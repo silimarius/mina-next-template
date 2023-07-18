@@ -1,6 +1,9 @@
 import { useContractStore } from "@/store/contract";
-import { TRANSACTION_FEE } from "@/utils";
-import { useInitAccount, useInitMina } from "@/services/contract";
+import {
+  useCallUpdate,
+  useInitAccount,
+  useInitMina,
+} from "@/services/contract";
 
 import { zkappWorkerClient } from "@/services/zkappWorkerClient";
 
@@ -9,52 +12,17 @@ export default function Home() {
   const hasBeenSetup = useContractStore((state) => state.hasBeenSetup);
   const accountExists = useContractStore((state) => state.accountExists);
   const num = useContractStore((state) => state.num);
-  const publicKey = useContractStore((state) => state.publicKey);
   const zkappPublicKey = useContractStore((state) => state.zkappPublicKey);
   const creatingTransaction = useContractStore(
     (state) => state.creatingTransaction
   );
 
-  const setCreatingTransaction = useContractStore(
-    (state) => state.setCreatingTransaction
-  );
   const setNum = useContractStore((state) => state.setNum);
+
+  const callUpdate = useCallUpdate();
 
   useInitMina();
   useInitAccount();
-
-  const onSendTransaction = async () => {
-    setCreatingTransaction(true);
-    console.log("sending a transaction...");
-
-    if (!zkappWorkerClient || !publicKey || !window.mina) return;
-
-    await zkappWorkerClient.fetchAccount({ publicKey });
-
-    await zkappWorkerClient.createUpdateTransaction();
-
-    console.log("creating proof...");
-    await zkappWorkerClient.proveUpdateTransaction();
-
-    console.log("getting Transaction JSON...");
-    const transactionJSON = await zkappWorkerClient.getTransactionJSON();
-    if (!transactionJSON) return;
-
-    console.log("requesting send transaction...");
-    const { hash } = await window.mina.sendTransaction({
-      transaction: transactionJSON,
-      feePayer: {
-        fee: TRANSACTION_FEE,
-        memo: "",
-      },
-    });
-
-    console.log(
-      `See transaction at https://berkeley.minaexplorer.com/transaction/${hash}`
-    );
-
-    setCreatingTransaction(false);
-  };
 
   const onRefreshCurrentNum = async () => {
     if (!zkappWorkerClient || !zkappPublicKey) return;
@@ -115,7 +83,7 @@ export default function Home() {
     mainContent = (
       <div>
         <button
-          onClick={() => void onSendTransaction()}
+          onClick={() => void callUpdate()}
           disabled={creatingTransaction}
         >
           {" "}
