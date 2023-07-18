@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { PublicKey } from "snarkyjs";
 
-import { zkappWorkerClient } from "@/pages/zkappWorkerClient";
 import { useContractStore } from "@/store/contract";
 import { wait } from "@/utils";
+
+import { zkappWorkerClient } from "./zkappWorkerClient";
 
 export const useInitMina = () => {
   const hasBeenSetup = useContractStore((state) => state.hasBeenSetup);

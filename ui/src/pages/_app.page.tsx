@@ -1,7 +1,7 @@
-import "@/styles/globals.css";
 import { type AppProps } from "next/app";
 
-import "./reactCOIServiceWorker";
+import "@/styles/globals.css";
+import "@/services/reactCOIServiceWorker";
 
 interface MinaWallet {
   requestAccounts: () => Promise<string[]>;

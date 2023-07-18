@@ -2,7 +2,7 @@ import { useContractStore } from "@/store/contract";
 import { TRANSACTION_FEE } from "@/utils";
 import { useInitAccount, useInitMina } from "@/services/contract";
 
-import { zkappWorkerClient } from "./zkappWorkerClient";
+import { zkappWorkerClient } from "@/services/zkappWorkerClient";
 
 export default function Home() {
   const hasWallet = useContractStore((state) => state.hasWallet);
