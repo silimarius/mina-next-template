@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import { useContractStore } from "@/store/contract";
 import { wait, TRANSACTION_FEE } from "@/utils";
-import { useInitAccount } from "@/hooks/contract";
+import { useInitAccount } from "@/services/contract";
 
 import { zkappWorkerClient } from "./zkappWorkerClient";
 
