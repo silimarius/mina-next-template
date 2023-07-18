@@ -1,13 +1,15 @@
 import { type fetchAccount, type PublicKey, Field } from "snarkyjs";
-
-import {
-  type ZkappWorkerRequest,
-  type ZkappWorkerReponse,
-  type WorkerFunctions,
-} from "./zkappWorker";
 import { z } from "zod";
 
-export default class ZkappWorkerClient {
+import { isClient } from "@/utils";
+
+import type {
+  ZkappWorkerRequest,
+  ZkappWorkerReponse,
+  WorkerFunctions,
+} from "./zkappWorker";
+
+class ZkappWorkerClient {
   worker: Worker;
 
   promises: {
@@ -96,3 +98,5 @@ export default class ZkappWorkerClient {
     return z.string().parse(result);
   }
 }
+
+export const zkappWorkerClient = isClient ? new ZkappWorkerClient() : undefined;

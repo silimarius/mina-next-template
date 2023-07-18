@@ -2,15 +2,9 @@ import { PublicKey } from "snarkyjs";
 import { useEffect } from "react";
 
 import { useContractStore } from "@/store/contract";
-import ZkappWorkerClient from "./zkappWorkerClient";
+import { wait, TRANSACTION_FEE } from "@/utils";
 
-const transactionFee = 0.1;
-
-const wait = (ms = 2000) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const isClient = typeof window !== "undefined";
-
-const zkappWorkerClient = isClient ? new ZkappWorkerClient() : undefined;
+import { zkappWorkerClient } from "./zkappWorkerClient";
 
 export default function Home() {
   const hasWallet = useContractStore((state) => state.hasWallet);
@@ -131,7 +125,7 @@ export default function Home() {
     const { hash } = await window.mina.sendTransaction({
       transaction: transactionJSON,
       feePayer: {
-        fee: transactionFee,
+        fee: TRANSACTION_FEE,
         memo: "",
       },
     });
