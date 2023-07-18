@@ -55,7 +55,7 @@ export const useInitMina = () => {
 
       console.info("getting zkApp state...");
       await zkappWorkerClient.fetchAccount({ publicKey: zkappPublicKey });
-      const currentNum = await zkappWorkerClient.getNum();
+      const currentNum = await zkappWorkerClient.fetchNum();
       if (!currentNum) {
         console.warn("current num undefined");
         return;
@@ -149,4 +149,27 @@ export const useCallUpdate = () => {
   };
 
   return callUpdate;
+};
+
+export const useFetchNum = () => {
+  const zkappPublicKey = useContractStore((state) => state.zkappPublicKey);
+
+  const setNum = useContractStore((state) => state.setNum);
+
+  const fetchNum = async () => {
+    if (!zkappWorkerClient || !zkappPublicKey) return;
+
+    console.info("getting zkApp state...");
+    await zkappWorkerClient.fetchAccount({
+      publicKey: zkappPublicKey,
+    });
+    const currentNum = await zkappWorkerClient.fetchNum();
+    console.info("current state:", currentNum?.toString());
+
+    if (!currentNum) return;
+
+    setNum(currentNum);
+  };
+
+  return fetchNum;
 };

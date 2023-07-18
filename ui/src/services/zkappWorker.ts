@@ -44,7 +44,7 @@ const functions = {
     const publicKey = PublicKey.fromBase58(parsed.publicKey58);
     state.zkapp = new state.Add(publicKey);
   },
-  getNum: async (_args: unknown) => {
+  fetchNum: async (_args: unknown) => {
     if (!state.zkapp) return;
     const currentNum = await state.zkapp.num.fetch();
     if (!currentNum) return;

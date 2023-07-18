@@ -1,43 +1,25 @@
 import { useContractStore } from "@/store/contract";
 import {
   useCallUpdate,
+  useFetchNum,
   useInitAccount,
   useInitMina,
 } from "@/services/contract";
-
-import { zkappWorkerClient } from "@/services/zkappWorkerClient";
 
 export default function Home() {
   const hasWallet = useContractStore((state) => state.hasWallet);
   const hasBeenSetup = useContractStore((state) => state.hasBeenSetup);
   const accountExists = useContractStore((state) => state.accountExists);
   const num = useContractStore((state) => state.num);
-  const zkappPublicKey = useContractStore((state) => state.zkappPublicKey);
   const creatingTransaction = useContractStore(
     (state) => state.creatingTransaction
   );
 
-  const setNum = useContractStore((state) => state.setNum);
-
   const callUpdate = useCallUpdate();
+  const fetchNum = useFetchNum();
 
   useInitMina();
   useInitAccount();
-
-  const onRefreshCurrentNum = async () => {
-    if (!zkappWorkerClient || !zkappPublicKey) return;
-
-    console.log("getting zkApp state...");
-    await zkappWorkerClient.fetchAccount({
-      publicKey: zkappPublicKey,
-    });
-    const currentNum = await zkappWorkerClient.getNum();
-    console.log("current state:", currentNum?.toString());
-
-    if (!currentNum) return;
-
-    setNum(currentNum);
-  };
 
   let walletContent;
   if (hasWallet !== undefined && !hasWallet) {
@@ -90,10 +72,7 @@ export default function Home() {
           Send Transaction{" "}
         </button>
         <div> Current Number in zkApp: {num?.toString()} </div>
-        <button onClick={() => void onRefreshCurrentNum()}>
-          {" "}
-          Get Latest State{" "}
-        </button>
+        <button onClick={() => void fetchNum()}> Get Latest State </button>
       </div>
     );
   }

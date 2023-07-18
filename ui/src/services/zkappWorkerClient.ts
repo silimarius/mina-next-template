@@ -85,8 +85,8 @@ class ZkappWorkerClient {
     return this.call("proveUpdateTransaction", {});
   }
 
-  async getNum(): Promise<Field | undefined> {
-    const result = await this.call("getNum", {});
+  async fetchNum(): Promise<Field | undefined> {
+    const result = await this.call("fetchNum", {});
     if (!result) return;
     const strRes = z.string().parse(result);
     return Field(strRes);
