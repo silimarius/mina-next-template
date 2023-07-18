@@ -1,9 +1,6 @@
-import { PublicKey } from "snarkyjs";
-import { useEffect } from "react";
-
 import { useContractStore } from "@/store/contract";
-import { wait, TRANSACTION_FEE } from "@/utils";
-import { useInitAccount } from "@/services/contract";
+import { TRANSACTION_FEE } from "@/utils";
+import { useInitAccount, useInitMina } from "@/services/contract";
 
 import { zkappWorkerClient } from "./zkappWorkerClient";
 
@@ -18,73 +15,13 @@ export default function Home() {
     (state) => state.creatingTransaction
   );
 
-  const setupState = useContractStore((state) => state.setupState);
-  const setHasWallet = useContractStore((state) => state.setHasWallet);
   const setCreatingTransaction = useContractStore(
     (state) => state.setCreatingTransaction
   );
   const setNum = useContractStore((state) => state.setNum);
 
+  useInitMina();
   useInitAccount();
-
-  useEffect(() => {
-    void (async () => {
-      if (!zkappWorkerClient || hasBeenSetup) return;
-
-      await wait(4000);
-
-      console.log("setting to testnet");
-      await zkappWorkerClient.setActiveInstanceToBerkeley();
-
-      console.log("getting mina");
-
-      if (!window.mina) {
-        console.log("mina not present");
-        setHasWallet(false);
-        return;
-      }
-      console.log("mina present");
-
-      const publicKeyBase58: string = (await window.mina.requestAccounts())[0];
-      const publicKey = PublicKey.fromBase58(publicKeyBase58);
-
-      console.log("using key", publicKey.toBase58());
-
-      console.log("checking if account exists...");
-      const res = await zkappWorkerClient.fetchAccount({
-        publicKey: publicKey,
-      });
-      const accountExists = res.error === undefined;
-
-      await zkappWorkerClient.loadContract();
-
-      console.log("compiling zkApp");
-      await zkappWorkerClient.compileContract();
-      console.log("zkApp compiled");
-
-      const zkappPublicKey = PublicKey.fromBase58(
-        "B62qkrit4M81pkWcs3Limog9Mn2tB4aQk2xLC9jmG82kKnFuXY7bM6a"
-      );
-
-      await zkappWorkerClient.initZkappInstance(zkappPublicKey);
-
-      console.log("getting zkApp state...");
-      await zkappWorkerClient.fetchAccount({ publicKey: zkappPublicKey });
-      const currentNum = await zkappWorkerClient.getNum();
-      if (!currentNum) {
-        console.warn("current num undefined");
-        return;
-      }
-      console.log("current state:", currentNum);
-
-      setupState({
-        publicKey,
-        zkappPublicKey,
-        accountExists,
-        num: currentNum,
-      });
-    })();
-  }, [hasBeenSetup, setHasWallet, setupState]);
 
   const onSendTransaction = async () => {
     setCreatingTransaction(true);
